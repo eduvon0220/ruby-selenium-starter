@@ -90,9 +90,9 @@ if (BASE_URL == "")
   puts "You need to set your DEFAULT_BASE_URL variable at the top of config.py"
 end
 
-if (options[:capabilities])
-  # if the user passed --capabilities "{...}" that that will be the only platform tested on 
-  # convert the string into a ruby hash so it can be used in as a desired capability
-end
 
 puts options
+
+# Get base url from config file
+# Get desktop_cap_array from config file
+# Get mobile_cap_array from config file
