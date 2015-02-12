@@ -49,7 +49,7 @@ opt_parser = OptionParser.new do |opts|
   end
 
   opts.on("--browserName", "Mobile: Only run tests on the given mobile browser name." + desired_cap_config_notes) do |b|
-    options[:browser_name] = b
+    options[:browserName] = b
   end
 
   opts.on("--platform", "Mobile: Only run tests on the given mobile platforms." + desired_cap_config_notes) do |p|
@@ -90,6 +90,42 @@ if (BASE_URL == "")
   puts "You need to set your DEFAULT_BASE_URL variable at the top of config.py"
 end
 
+desktop_cap_list = DESKTOP_CAP_LIST_CONFIGS
+
+mobile_cap_list = MOBILE_CAP_LIST_CONFIGS
+
+desired_cap_list = []
+
+if (options[:desktop])
+  # if the desktop argument has been passed, then only run the desktop tests
+  desired_cap_list += desktop_cap_list
+end
+
+if (options[:mobile])
+  # if the mobile argument has been passed, then only run the mobile tests
+  desired_cap_list += mobile_cap_list
+end
+
+if (desired_cap_list.empty?)
+  # if no desktop or mobile argument has been passed, then run both the desktop and mobile tests
+  desired_cap_list = desktop_cap_list + mobile_cap_list
+end
+
+# if a specific filter arg was set via the command line, remove anything from the desired_capabilities list that does not meet the requirement
+desired_cap_list_filters = [
+  "os",
+  "browser",
+  "browser_version",
+  "resolution",
+  "os_version",
+  "browserName",
+  "platform",
+  "device"
+]
+
+desired_cap_list_filters.each do |the_filter|
+
+end
 
 puts options
 
