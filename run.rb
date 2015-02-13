@@ -28,35 +28,35 @@ opt_parser = OptionParser.new do |opts|
 
   desired_cap_config_notes = " The available values you can pass to this command will depend on the values you have set in your config.rb file"
 
-  opts.on("--browser", "Desktop: Only run tests on the given browser." + desired_cap_config_notes) do |b|
+  opts.on("--browser x", "Desktop: Only run tests on the given browser." + desired_cap_config_notes) do |b|
     options[:browser] = b
   end
 
-  opts.on("--browser_version", "Desktop: Only run tests on the given browser version." + desired_cap_config_notes) do |b|
+  opts.on("--browser_version x", "Desktop: Only run tests on the given browser version." + desired_cap_config_notes) do |b|
     options[:browser_version] = b
   end
 
-  opts.on("--os", "Desktop: Only run tests on the given operating system." + desired_cap_config_notes) do |o|
+  opts.on("--os x", "Desktop: Only run tests on the given operating system." + desired_cap_config_notes) do |o|
     options[:os] = o
   end
 
-  opts.on("--os_version", "Desktop: Only run tests on the given operating system version." + desired_cap_config_notes) do |o|
+  opts.on("--os_version x", "Desktop: Only run tests on the given operating system version." + desired_cap_config_notes) do |o|
     options[:os_version] = o
   end
 
-  opts.on("--resolution", "Desktop: Only run tests on the given screen resolution." + desired_cap_config_notes) do |r|
+  opts.on("--resolution x", "Desktop: Only run tests on the given screen resolution." + desired_cap_config_notes) do |r|
     options[:resolution] = r
   end
 
-  opts.on("--browserName", "Mobile: Only run tests on the given mobile browser name." + desired_cap_config_notes) do |b|
+  opts.on("--browserName x", "Mobile: Only run tests on the given mobile browser name." + desired_cap_config_notes) do |b|
     options[:browserName] = b
   end
 
-  opts.on("--platform", "Mobile: Only run tests on the given mobile platforms." + desired_cap_config_notes) do |p|
+  opts.on("--platform x", "Mobile: Only run tests on the given mobile platforms." + desired_cap_config_notes) do |p|
     options[:platform] = p
   end
 
-  opts.on("--device", "Mobile: Only run tests on the given mobile device." + desired_cap_config_notes) do |d|
+  opts.on("--device x", "Mobile: Only run tests on the given mobile device." + desired_cap_config_notes) do |d|
     options[:device] = d
   end
 
@@ -110,24 +110,34 @@ if (desired_cap_list.empty?)
   # if no desktop or mobile argument has been passed, then run both the desktop and mobile tests
   desired_cap_list = desktop_cap_list + mobile_cap_list
 end
-
 # if a specific filter arg was set via the command line, remove anything from the desired_capabilities list that does not meet the requirement
 desired_cap_list_filters = [
-  "os",
-  "browser",
-  "browser_version",
-  "resolution",
-  "os_version",
-  "browserName",
-  "platform",
-  "device"
+  :os,
+  :browser,
+  :browser_version,
+  :resolution,
+  :os_version,
+  :browserName,
+  :platform,
+  :device
 ]
 
 desired_cap_list_filters.each do |the_filter|
 
+# if a filter is passed through command line (like 'os') then continue within for loop
+  if (options[the_filter])
+      temp_list = desired_cap_list
+      desired_cap_list = []
+      temp_list.each do |desired_cap|
+        if (desired_cap.has_key?(the_filter) && desired_cap[the_filter] == options[the_filter])
+          desired_cap_list << desired_cap
+        end
+      end
+  end
 end
 
 puts options
+puts desired_cap_list
 
 # Get base url from config file
 # Get desktop_cap_array from config file
