@@ -22,7 +22,7 @@ opt_parser = OptionParser.new do |opts|
     options[:base_url] = base_url
   end
 
-  opts.on("--test", "Only run one test as specified") do |t|
+  opts.on("--test x", "Only run one test as specified") do |t|
     options[:test] = t
   end
 
@@ -199,6 +199,32 @@ desired_cap_list.each do |desired_cap|
     # otherwise, just run firefox locally.
     driver = Selenium::WebDriver.for :firefox
   end
+
+  tests_to_run = []
+
+  # If no specific test was specified, add all tests to the array of tests to run
+  unless (options.has_key?(:test))
+    #dynamically search the tests folder to add all of those files to the tests to run array
+    Dir['tests/*.rb'].each do |fname|
+      # do something with fname
+      fname.slice!("tests/")
+      tests_to_run << fname
+    end
+  # If a specific test was specified, just run add the specified test to the array of test to run
+  else
+
+    tests_to_run << options[:test]
+  end
+
+  tests_to_run.each do |test|
+    require "./tests/" + test 
+    current_test = Test.new()
+    current_test.run()
+  end
+
+
+
+
   driver.quit
 end
 
