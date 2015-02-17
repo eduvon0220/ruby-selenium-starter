@@ -1,6 +1,7 @@
-require 'selenium-webdriver'
-require 'optparse'
+require 'selenium-webdriver' # must install this as a gem on your local machine
+require 'optparse' # included as part of ruby library
 
+# set up the command line arguments
 options = {}
 
 opt_parser = OptionParser.new do |opts|
@@ -10,11 +11,11 @@ opt_parser = OptionParser.new do |opts|
     options[:desktop] = d
   end
 
-  opts.on("--mobile", "(boolean) Make the tests only run tests on mobile devices.")   do |m|
+  opts.on("--mobile", "(boolean) Make the tests only run tests on mobile devices.") do |m|
     options[:mobile] = m
   end
 
-  opts.on("--use_local", "(boolean) Use the local Browserstack selenium testing.")    do |l|
+  opts.on("--use_local", "(boolean) Use the local Browserstack selenium testing.") do |l|
     options[:use_local] = l
   end
 
@@ -97,29 +98,36 @@ if (BASE_URL == "")
   puts "You need to set your DEFAULT_BASE_URL variable at the top of config.py"
 end
 
+# If browserstack is set to be used then set up desired capabilities array, etc.
 if (options[:browserstack])
 
+  # This has been set as an array so we can set multiple environments and run the tests below
+  # in a for loop to repeat the tests for different operating systems. I have set a mobile capability
+  # list and desktop capability list to allow the use of either or with a flag. More tests can easily be added.
+  # See the browserstack website to get more options.
+  # The below tests IE8, IE9, IE10 and IE11 on windows and then chrome, safari, and firefox on Mac.
+  # Pay attention to the version numbers.
   desktop_cap_list = DESKTOP_CAP_LIST_CONFIGS
 
+  # The below tests on iPhone 5 and Samsung Galaxy S5. If your Selenium Automate plan doesn't include Mobile,
+  # you will want to change the following to mobile_cap_list = []
   mobile_cap_list = MOBILE_CAP_LIST_CONFIGS
 
+  # Conditionally create the desired_cap_list list. Didn't use elsif statements to allow for more user error.
   desired_cap_list = []
-
   if (options[:desktop])
-    # if the desktop argument has been passed, then only run the desktop tests
+    # If the desktop argument has been passed, then only run the desktop tests
     desired_cap_list += desktop_cap_list
   end
-
   if (options[:mobile])
-    # if the mobile argument has been passed, then only run the mobile tests
+    # If the mobile argument has been passed, then only run the mobile tests
     desired_cap_list += mobile_cap_list
   end
-
   if (desired_cap_list.empty?)
-    # if no desktop or mobile argument has been passed, then run both the desktop and mobile tests
+    # If no desktop or mobile argument has been passed, then run both the desktop and mobile tests
     desired_cap_list = desktop_cap_list + mobile_cap_list
   end
-  # if a specific filter arg was set via the command line, remove anything from the desired_capabilities list that does not meet the requirement
+  # If a specific filter arg was set via the command line, remove anything from the desired_capabilities list that does not meet the requirement
   desired_cap_list_filters = [
     :os,
     :browser,
@@ -132,7 +140,7 @@ if (options[:browserstack])
   ]
 
   desired_cap_list_filters.each do |the_filter|
-
+  # Loops through the list above so as only to use the options that are passed in.
   # if a filter is passed through command line (like 'os') then continue within for loop
     if (options[the_filter])
         temp_list = desired_cap_list
@@ -152,43 +160,43 @@ end
 
 # This will run the same test code in multiple environments
 desired_cap_list.each do |desired_cap|
-  # if the browserstack argument was passed, then use the following to output the test headers
+  # If the browserstack argument was passed, then use the following to output the test headers
   if (options[:browserstack])
-    # use browserstack local testing if the argument was passed
-
-    # output a line to show what environment is now being tested
+    # Output a line to show what environment is now being tested
     if (desired_cap[:browser])
-      # for desktop on browserstack
+      # For desktop on browserstack
       puts "\nStarting Tests on %s %s on %s %s with a screen resolution of %s " %
       [desired_cap[:browser], desired_cap[:browser_version], desired_cap[:os], desired_cap[:os_version], desired_cap[:resolution]]
     else
-      # for mobile on browserstack
+      # For mobile on browserstack
       puts "\nStarting Tests on a %s" % [desired_cap[:device]]
     end
-    #otherwise, just simply output this message
+    # Otherwise, just simply output this message
   else
-    # for desktop on local machine using firefox
+    # For desktop on local machine using firefox
     puts "\nStarting Tests on %s on your local machine" % [desired_cap[:browser]]
   end
 
   puts "------------------------------------------------------\n"
 
-  # if the browserstack argument was passed, then dynamically set up the remote driver.
+  # If the browserstack argument was passed, then dynamically set up the remote driver.
   if (options[:browserstack])
     caps = Selenium::WebDriver::Remote::Capabilities.new
+    # If the "os" option is passed, use the desktop capabilities
     if (desired_cap.has_key?("os"))
       caps["browser"] = desired_cap[:browser]
       caps["browser_version"] = desired_cap[:browser_version]
       caps["os"] = desired_cap[:os]
       caps["os_version"] = desired_cap[:os_version]
-      # caps["name"] = "Testing Selenium 2 with Ruby on BrowserStack"
       caps["resolution"] = desired_cap[:resolution]
     end
+    # If the "device" option is passed, use the mobile capabilities
     if (desired_cap.has_key?("device"))
       caps["browserName"] = desired_cap[:browserName]
       caps["platform"] = desired_cap[:platform]
       caps["device"] = desired_cap[:device]
     end
+    # Use browserstack local testing if the argument was passed
     if (options[:use_local])
       cap['browserstack.local'] = true
     end
@@ -196,39 +204,41 @@ desired_cap_list.each do |desired_cap|
       :url => "http://%s:%s@hub.browserstack.com:80/wd/hub" % [selenium_username, selenium_value],
       :desired_capabilities => desired_cap)
   else
-    # otherwise, just run firefox locally.
+    # Otherwise, just run firefox locally.
     driver = Selenium::WebDriver.for :firefox
   end
 
   tests_to_run = []
-
   # If no specific test was specified, add all tests to the array of tests to run
   unless (options.has_key?(:test))
-    #dynamically search the tests folder to add all of those files to the tests to run array
+    # Dynamically search the tests folder to add all of those files to the tests to run array
     Dir['tests/*.rb'].each do |fname|
-      # do something with fname
+      # Remove "tests/" from the filename
       fname.slice!("tests/")
+      # Add the tests to the array except for base_test.rb which is the super class
       unless(fname == "base_test.rb")
         tests_to_run << fname
       end
     end
-  # If a specific test was specified, just run add the specified test to the array of test to run
+  # If a specific test was specified, just add the specified test to the array of tests to run
   else
-
     tests_to_run << options[:test]
   end
-
+  # The time when the tests started
   all_tests_start_time = Time.now().to_f
-
+  # Loops through all the tests_to_run and runs them
   tests_to_run.each do |test|
     this_test_start_time = Time.now().to_f
+    # This dynamically requires all files into the tests_to_run list
     require "./tests/" + test 
+    # Instantiates a test and runs it
     current_test = Test.new(driver, BASE_URL, test)
     current_test.run()
 
     # If it makes it this far, this means the test passed
     current_test.passed()
 
+    # Output the amount of time it took this test to run on the current platform
     this_test_seconds_taken = Time.now().to_f - this_test_start_time
     if(this_test_seconds_taken > 60)
       puts "Time Taken: " + (this_test_seconds_taken/60).to_s + " minutes"
@@ -238,6 +248,7 @@ desired_cap_list.each do |desired_cap|
   end
 
   puts "--------------------------------------------------------\n"
+  # Output the amount of time it took all tests to run on the current platform
   all_tests_seconds_taken = Time.now().to_f - all_tests_start_time.to_f
   if(all_tests_seconds_taken > 60)
     puts "Time Taken for all tests: " + (all_test_seconds_taken/60).to_s + " minutes"
@@ -245,13 +256,7 @@ desired_cap_list.each do |desired_cap|
     puts "Time Taken for all tests: " + (all_tests_seconds_taken).to_s + " seconds"
   end
 
-
-
-
+  # Clean up
   driver.quit
 end
 
-
-# Get base url from config file
-# Get desktop_cap_array from config file
-# Get mobile_cap_array from config file
