@@ -16,7 +16,7 @@ Getting Started
 directory. Copy the structure in the examples and your tests
 should be executed automagically by the above.
 - You will likely want to update the data in the config.rb
-file. But should not need to update anything in the rub.rb file unless you are applying a general fix to this repo that you plan to contribute.
+file. But should not need to update anything in the ruby.rb file unless you are applying a general fix to this repo that you plan to contribute.
 
 General Examples
 --------
