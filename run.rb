@@ -218,13 +218,31 @@ desired_cap_list.each do |desired_cap|
     tests_to_run << options[:test]
   end
 
+  all_tests_start_time = Time.now().to_f
+
   tests_to_run.each do |test|
+    this_test_start_time = Time.now().to_f
     require "./tests/" + test 
     current_test = Test.new(driver, BASE_URL, test)
     current_test.run()
 
     # If it makes it this far, this means the test passed
     current_test.passed()
+
+    this_test_seconds_taken = Time.now().to_f - this_test_start_time
+    if(this_test_seconds_taken > 60)
+      puts "Time Taken: " + (this_test_seconds_taken/60).to_s + " minutes"
+    else
+      puts "Time Taken: " + (this_test_seconds_taken).to_s + " seconds"
+    end
+  end
+
+  puts "--------------------------------------------------------\n"
+  all_tests_seconds_taken = Time.now().to_f - all_tests_start_time.to_f
+  if(all_tests_seconds_taken > 60)
+    puts "Time Taken for all tests: " + (all_test_seconds_taken/60).to_s + " minutes"
+  else
+    puts "Time Taken for all tests: " + (all_tests_seconds_taken).to_s + " seconds"
   end
 
 
@@ -232,9 +250,6 @@ desired_cap_list.each do |desired_cap|
 
   driver.quit
 end
-
-puts options
-puts desired_cap_list
 
 
 # Get base url from config file
