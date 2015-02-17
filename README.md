@@ -6,8 +6,9 @@ and not be concerned with the basic set up of your test framework. This has opti
 
 Installing Selenium
 ----------
-gem install selenium-webdriver
 ```
+gem install selenium-webdriver
+
 
 Getting Started
 -----------
