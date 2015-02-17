@@ -208,7 +208,7 @@ desired_cap_list.each do |desired_cap|
     Dir['tests/*.rb'].each do |fname|
       # do something with fname
       fname.slice!("tests/")
-      unless(fname == "base_test")
+      unless(fname == "base_test.rb")
         tests_to_run << fname
       end
     end
@@ -220,8 +220,8 @@ desired_cap_list.each do |desired_cap|
 
   tests_to_run.each do |test|
     require "./tests/" + test 
-    current_test = Test.new()
-    current_test.run(driver, BASE_URL, test_to_run)
+    current_test = Test.new(driver, BASE_URL, test)
+    current_test.run()
 
     # If it makes it this far, this means the test passed
     current_test.passed()

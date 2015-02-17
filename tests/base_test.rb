@@ -18,8 +18,13 @@ class BaseTest
   end
 
   def take_screenshot()
-  	millis = Time.now.millis
-  	@driver.save_screenshot("screenshots/" + @driver.name + "-" + millis.to_s + "-screenshots.png")
+  	millis = Time.now.to_f * 1000
+  	if(defined?(@driver.name))
+  		driver_name = @driver.name
+  	else
+  		driver_name = ""
+  	end
+  	@driver.save_screenshot("screenshots/" + driver_name + "-" + millis.to_s + "-screenshots.png")
   end
 
 end
