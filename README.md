@@ -8,7 +8,7 @@ Installing Selenium
 ----------
 ```
 gem install selenium-webdriver
-
+```
 
 Getting Started
 -----------
