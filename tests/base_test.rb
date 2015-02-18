@@ -18,7 +18,7 @@ class BaseTest
   	# Parameters
   	# ----------
   	# error_message: (string) A message describing what went wrong with the test.
-  	puts("Error: " + error_message)
+  	puts("Failed: " + @filename + ": " + error_message)
   	self.take_screenshot()
   	@driver.quit()
   	exit()
