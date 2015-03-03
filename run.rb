@@ -251,7 +251,7 @@ desired_cap_list.each do |desired_cap|
   # Output the amount of time it took all tests to run on the current platform
   all_tests_seconds_taken = Time.now().to_f - all_tests_start_time.to_f
   if(all_tests_seconds_taken > 60)
-    puts "Time Taken for all tests: " + (all_test_seconds_taken/60).to_s + " minutes"
+    puts "Time Taken for all tests: " + (all_tests_seconds_taken/60).to_s + " minutes"
   else
     puts "Time Taken for all tests: " + (all_tests_seconds_taken).to_s + " seconds"
   end
