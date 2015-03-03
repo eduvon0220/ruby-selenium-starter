@@ -72,6 +72,11 @@ opt_parser = OptionParser.new do |opts|
     options[:browserstack] = c
   end
 
+  opts.on("--phantom", "Will run tests via Phantom JS which will be a little faster. Will not work" +
+          " with Browserstack.") do |p|
+    options[:phantom] = p
+  end
+
 end
 
 opt_parser.parse!
@@ -155,7 +160,11 @@ if (options[:browserstack])
 # If the --browserstack argument was not passed, just set one element in the desired_cap_list
 # for the sake of using the same logic below. When looping through the elements of the desired_cap_list
 else
-  desired_cap_list = [{browser: "Firefox"}]
+  if(options[:phantom])
+    desired_cap_list = [{browser: "PhantomJs"}]
+  else
+    desired_cap_list = [{browser: "Firefox"}]
+  end
 end
 
 # This will run the same test code in multiple environments
@@ -205,7 +214,14 @@ desired_cap_list.each do |desired_cap|
       :desired_capabilities => desired_cap)
   else
     # Otherwise, just run firefox locally.
-    driver = Selenium::WebDriver.for :firefox
+    if(options[:phantom])
+      caps = {:acceptSslCerts => true}
+      driver = Selenium::WebDriver.for(:phantomjs, :desired_capabilities => caps)
+      # With Phantom js, we need te set a specific window size to prevent certain tests from failing
+      driver.manage.window.resize_to(1124, 850)
+    else
+      driver = Selenium::WebDriver.for :firefox
+    end
   end
 
   tests_to_run = []
